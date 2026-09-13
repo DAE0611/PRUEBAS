@@ -138,7 +138,7 @@
   <div class="hrow">
     <div>
       <h1>Reporte de Ruta</h1>
-      <div class="sub">Logística Robedans · <span id="appVer">1.0.0</span></div>
+      <div class="sub">Logística Robedans · <span id="appVer">1.0.2</span></div>
       <div class="saved" id="savedInfo">Los datos se guardan solos en este teléfono</div>
       <div class="syncinfo sync-ok" id="syncInfo">☁️ Sincronización activada</div>
     </div>
@@ -153,17 +153,21 @@
     <div class="card-body">
       <div class="fila2">
         <div><label>Fecha</label><input type="date" id="fecha" class="campo"></div>
-        <div><label>Vehículo</label><input list="lVeh" id="vehiculo" class="campo" placeholder="Seleccione">
-          <datalist id="lVeh"><option value="Kia"><option value="NHR"><option value="Foton"></datalist></div>
+        <div><label>Vehículo</label>
+          <select id="vehiculo" class="campo"><option value="">Seleccione…</option></select></div>
       </div>
       <label>Ruta</label>
       <input list="lRuta" id="ruta" class="campo" placeholder="Ej: Medellín, Oriente, Norte…">
       <datalist id="lRuta"><option value="Medellín"><option value="Oriente"><option value="Norte"><option value="Sur"></datalist>
       <div class="fila2">
         <div><label>Conductor</label>
-          <select id="conductor" class="campo"><option value="">Seleccione…</option></select></div>
+          <select id="conductor" class="campo"><option value="">Seleccione…</option></select>
+          <label style="font-size:12px;color:var(--gris);margin:4px 0 0">Inicio de turno</label>
+          <div class="hora-wrap"><input type="time" id="ingConductor" class="campo"><button type="button" class="btn-ahora" data-ahora="ingConductor">🕒 Ahora</button></div></div>
         <div><label>Auxiliar 1</label>
-          <select id="auxiliar" class="campo"><option value="">Seleccione…</option></select></div>
+          <select id="auxiliar" class="campo"><option value="">Seleccione…</option></select>
+          <label style="font-size:12px;color:var(--gris);margin:4px 0 0">Inicio de turno</label>
+          <div class="hora-wrap"><input type="time" id="ingAuxiliar1" class="campo"><button type="button" class="btn-ahora" data-ahora="ingAuxiliar1">🕒 Ahora</button></div></div>
       </div>
       <div id="bloqueAux2" style="display:none;margin-top:4px">
         <div style="display:flex;align-items:center;justify-content:space-between">
@@ -171,6 +175,8 @@
           <button type="button" id="btnQuitarAux2" style="background:none;border:none;color:var(--rojo);font-weight:700;font-size:13px">✕ Quitar</button>
         </div>
         <select id="auxiliar2" class="campo"><option value="">Seleccione…</option></select>
+        <label style="font-size:12px;color:var(--gris);margin:4px 0 0">Inicio de turno (Auxiliar 2)</label>
+        <div class="hora-wrap"><input type="time" id="ingAuxiliar2" class="campo"><button type="button" class="btn-ahora" data-ahora="ingAuxiliar2">🕒 Ahora</button></div>
       </div>
       <button type="button" class="btn-add" id="btnAux2" style="margin-top:6px">＋ Agregar auxiliar 2</button>
       <div class="fila2">
@@ -241,17 +247,15 @@
       </div>
 
       <div style="margin-top:14px;border-top:1px dashed var(--linea);padding-top:12px">
-        <button type="button" class="btn-add" id="btnCerrarTurno">🕐 Ajustar horario de un colaborador (opcional)</button>
-        <div style="font-size:12px;color:var(--gris);margin-top:4px">Solo si alguien ingresó después o se retiró antes de la ruta.</div>
+        <button type="button" class="btn-add" id="btnCerrarTurno">🕐 Registrar retiro anticipado de un colaborador (opcional)</button>
+        <div style="font-size:12px;color:var(--gris);margin-top:4px">Solo si alguien se retiró antes de terminar la ruta. (La hora de ingreso se pone arriba, junto a cada colaborador.)</div>
         <div id="bloqueCerrarTurno" style="display:none;margin-top:8px">
-          <label>Colaborador</label>
+          <label>Colaborador que se retira</label>
           <select id="ctColab" class="campo"><option value="">Seleccione…</option></select>
-          <label style="margin-top:6px">Hora de ingreso <span style="font-weight:400">(si entró después; opcional)</span></label>
-          <div class="hora-wrap"><input type="time" id="ctIngreso" class="campo"><button type="button" class="btn-ahora" data-ahora="ctIngreso">🕒 Ahora</button></div>
-          <label style="margin-top:6px">Hora de retiro <span style="font-weight:400">(si salió antes; opcional)</span></label>
+          <label style="margin-top:6px">Hora de retiro</label>
           <div class="hora-wrap"><input type="time" id="ctHora" class="campo"><button type="button" class="btn-ahora" data-ahora="ctHora">🕒 Ahora</button></div>
           <div style="display:flex;gap:10px;align-items:center;margin-top:8px">
-            <button type="button" class="btn-ubic" id="btnCtGuardar">Guardar horario</button>
+            <button type="button" class="btn-ubic" id="btnCtGuardar">Guardar retiro</button>
             <button type="button" id="btnCtCancelar" style="background:none;border:none;color:var(--gris);font-weight:700;font-size:13px">Cancelar</button>
           </div>
         </div>
@@ -515,7 +519,7 @@
       HorasRutaAuxiliar1:horasRuta(ingresoTurno.auxiliar1||e.horaSalida,cierreTurno.auxiliar1||e.horaFin),
       HorasRutaAuxiliar2:(e.auxiliar2?horasRuta(ingresoTurno.auxiliar2||e.horaSalida,cierreTurno.auxiliar2||e.horaFin):""),
       Efectivo:R.r.Efectivo,Transferencia:R.r.Transferencia,FirmaCredito:R.r.FirmaCredito,
-      TotalFacturado:R.fact,TotalRecaudado:R.recaudado,EfectivoAEntregar:R.efectivoEntregar,
+      TotalFacturado:R.ent.fact,TotalRecaudado:R.recaudado,EfectivoAEntregar:R.efectivoEntregar,
       EfectivoEntregas:R.ent.Efectivo,TransferenciaEntregas:R.ent.Transferencia,TotalEntregas:R.ent.fact,
       EfectivoCobros:R.cob.Efectivo,TransferenciaCobros:R.cob.Transferencia,TotalCobros:R.cob.fact,
       NovedadesGenerales:e.novedades||"",
@@ -641,28 +645,28 @@
     if($("auxiliar2").value)arr.push(["auxiliar2","Auxiliar 2: "+$("auxiliar2").value]);
     return arr;
   }
-  function tieneAjuste(k){return !!(cierreTurno[k]||ingresoTurno[k]);}
   function pintarCierreTurno(){
     var sel=$("ctColab");
-    if(sel){var html='<option value="">Seleccione…</option>';colaboradoresRuta().forEach(function(par){if(!tieneAjuste(par[0]))html+='<option value="'+par[0]+'">'+esc(par[1])+'</option>';});sel.innerHTML=html;}
+    if(sel){var html='<option value="">Seleccione…</option>';colaboradoresRuta().forEach(function(par){if(!cierreTurno[par[0]])html+='<option value="'+par[0]+'">'+esc(par[1])+'</option>';});sel.innerHTML=html;}
     var res=$("cierreTurnoResumen");
     if(res){var h="";var labels={conductor:"Conductor",auxiliar1:"Auxiliar 1",auxiliar2:"Auxiliar 2"};
-      ["conductor","auxiliar1","auxiliar2"].forEach(function(k){if(tieneAjuste(k)){var partes=[];if(ingresoTurno[k])partes.push("ingresó "+fmtHora(ingresoTurno[k]));if(cierreTurno[k])partes.push("se retiró "+fmtHora(cierreTurno[k]));h+='<div style="margin:2px 0">🕐 '+labels[k]+': '+partes.join(" · ")+' <button type="button" data-ct-del="'+k+'" style="background:none;border:none;color:var(--rojo);font-weight:700">✕</button></div>';}});
+      ["conductor","auxiliar1","auxiliar2"].forEach(function(k){if(cierreTurno[k])h+='<div style="margin:2px 0">🕐 '+labels[k]+' se retiró a las '+fmtHora(cierreTurno[k])+' <button type="button" data-ct-del="'+k+'" style="background:none;border:none;color:var(--rojo);font-weight:700">✕</button></div>';});
       res.innerHTML=h;}
     var btn=$("btnCerrarTurno");if(!btn)return;
-    var libres=colaboradoresRuta().filter(function(par){return !tieneAjuste(par[0]);}).length;
+    var libres=colaboradoresRuta().filter(function(par){return !cierreTurno[par[0]];}).length;
     btn.style.display=(libres===0)?"none":"flex";
   }
   function guardarCierreTurno(){
-    var slot=$("ctColab").value,ing=$("ctIngreso").value,ret=$("ctHora").value;
-    if(!slot){toast("Elige el colaborador");return;}
-    if(!ing&&!ret){toast("Registra al menos la hora de ingreso o la de retiro");return;}
+    var slot=$("ctColab").value,ret=$("ctHora").value;
+    if(!slot){toast("Elige el colaborador que se retira");return;}
+    if(!ret){toast("Registra la hora de retiro");return;}
     var e=estado();
-    if(ing){ if(e.horaSalida && ing<e.horaSalida){toast("La hora de ingreso no puede ser anterior a la salida de bodega");return;} if(e.horaFin && ing>e.horaFin){toast("La hora de ingreso no puede ser posterior a la finalización");return;} }
-    if(ret){ var refIni=ing||e.horaSalida; if(refIni && !(ret>refIni)){toast("La hora de retiro debe ser posterior a la de ingreso/salida");return;} if(e.horaFin && ret>e.horaFin){toast("La hora de retiro no puede ser posterior a la finalización de la ruta");return;} }
-    ingresoTurno[slot]=ing||""; cierreTurno[slot]=ret||"";
-    $("ctColab").value="";$("ctIngreso").value="";$("ctHora").value="";$("bloqueCerrarTurno").style.display="none";
-    pintarCierreTurno();guardar();calcular();toast("Horario registrado");
+    var refIni=ingresoTurno[slot]||e.horaSalida;
+    if(refIni && !(ret>refIni)){toast("La hora de retiro debe ser posterior a la de inicio de turno");return;}
+    if(e.horaFin && ret>e.horaFin){toast("La hora de retiro no puede ser posterior a la finalización de la ruta");return;}
+    cierreTurno[slot]=ret;
+    $("ctColab").value="";$("ctHora").value="";$("bloqueCerrarTurno").style.display="none";
+    pintarCierreTurno();guardar();calcular();toast("Retiro registrado");
   }
   /* ===================== CATÁLOGO (#5) Y BLOQUEOS (#6) ===================== */
   var catalogo=null;
@@ -702,7 +706,7 @@
     if(prev){var found=false;for(var j=0;j<sel.options.length;j++){if(sel.options[j].value===prev){found=true;break;}}
       if(!found){var op=document.createElement("option");op.value=prev;op.textContent=prev;sel.appendChild(op);}sel.value=prev;}
   }
-  function aplicarCatalogo(c){if(!c)return;llenarDatalist("lVeh",c.Vehiculo);llenarDatalist("lRuta",c.Ruta);llenarSelect("conductor",c.Conductor);llenarSelect("auxiliar",c.Auxiliar);llenarSelect("auxiliar2",c.Auxiliar);}
+  function aplicarCatalogo(c){if(!c)return;llenarSelect("vehiculo",c.Vehiculo);llenarDatalist("lRuta",c.Ruta);llenarSelect("conductor",c.Conductor);llenarSelect("auxiliar",c.Auxiliar);llenarSelect("auxiliar2",c.Auxiliar);}
   function cargarCatalogo(){
     try{var c=JSON.parse(localStorage.getItem("catalogo"));if(c){catalogo=c;aplicarCatalogo(c);}}catch(e){}
     if(typeof navigator!=="undefined"&&navigator.onLine===false)return;
@@ -933,8 +937,9 @@
     var algo=false;
     for(var m=0;m<metodos.length;m++){if(metodos[m][1]>0){algo=true;h+='<div class="rline"><span class="lbl">'+metodos[m][0]+'</span><span class="v">'+money(metodos[m][1])+'</span></div>';}}
     if(!algo)h+='<div class="rline"><span class="lbl" style="color:var(--gris)">Aún no hay valores registrados</span><span class="v"></span></div>';
-    h+='<div class="rline tot"><span class="lbl">Total facturado</span><span class="v">'+money(R.fact)+'</span></div>';
-    h+='<div class="rline tot"><span class="lbl">Total recaudado (sin firma)</span><span class="v">'+money(R.recaudado)+'</span></div>';
+    h+='<div class="rline tot"><span class="lbl">Total facturado (entregas)</span><span class="v">'+money(R.ent.fact)+'</span></div>';
+    h+='<div class="rline tot"><span class="lbl">Total recaudado (cobros)</span><span class="v">'+money(R.cob.fact)+'</span></div>';
+    h+='<div class="rline"><span class="lbl">Recaudado efect + transf (sin firma)</span><span class="v">'+money(R.recaudado)+'</span></div>';
     if(R.base>0)h+='<div class="rline"><span class="lbl">Base entregada</span><span class="v">'+money(R.base)+'</span></div>';
     if(R.consig>0)h+='<div class="rline"><span class="lbl">− Consignaciones</span><span class="v">'+money(R.consig)+'</span></div>';
     if(R.gastos>0)h+='<div class="rline"><span class="lbl">− Gastos</span><span class="v">'+money(R.gastos)+'</span></div>';
@@ -974,6 +979,7 @@
       $("conductor").value=d.conductor||"";$("auxiliar").value=d.auxiliar||"";$("horaSalida").value=d.horaSalida||"";
       cierreTurno=d.cierreTurno||{conductor:"",auxiliar1:"",auxiliar2:""};
       ingresoTurno=d.ingresoTurno||{conductor:"",auxiliar1:"",auxiliar2:""};
+      $("ingConductor").value=ingresoTurno.conductor||"";$("ingAuxiliar1").value=ingresoTurno.auxiliar1||"";$("ingAuxiliar2").value=ingresoTurno.auxiliar2||"";
       if(d.auxiliar2){ if($("auxiliar2").options.length<=1){var o2=document.createElement("option");o2.value=d.auxiliar2;o2.textContent=d.auxiliar2;$("auxiliar2").appendChild(o2);} $("auxiliar2").value=d.auxiliar2; $("bloqueAux2").style.display="block"; $("btnAux2").style.display="none"; }
       $("tanqueo").value=d.tanqueo||"";$("kmInicial").value=d.kmInicial||"";$("base").value=d.base||"";
       $("canastIni").value=d.canastIni||"";$("clientesProg").value=d.clientesProg||"";$("justifNoAtend").value=d.justifNoAtend||"";$("novedades").value=d.novedades||"";$("horaFin").value=d.horaFin||"";
@@ -994,7 +1000,7 @@
     liberarNube(); // liberar vehículo/conductor/auxiliar del reporte anterior
     reporteId=uid();
     try{localStorage.removeItem("reporteRuta");}catch(e){}
-    ["vehiculo","ruta","conductor","auxiliar","auxiliar2","horaSalida","tanqueo","kmInicial","base","canastIni","clientesProg","justifNoAtend","novedades","horaFin","kmFinal","canastFin","b100","b50","b20","b10","b5","b2","monedas","totEfectivo","consig","totEntregado","parqueadero","peaje","otrosGasto","otrosCual"].forEach(function(id){$(id).value="";});
+    ["vehiculo","ruta","conductor","auxiliar","auxiliar2","ingConductor","ingAuxiliar1","ingAuxiliar2","horaSalida","tanqueo","kmInicial","base","canastIni","clientesProg","justifNoAtend","novedades","horaFin","kmFinal","canastFin","b100","b50","b20","b10","b5","b2","monedas","totEfectivo","consig","totEntregado","parqueadero","peaje","otrosGasto","otrosCual"].forEach(function(id){$(id).value="";});
     cierreTurno={conductor:"",auxiliar1:"",auxiliar2:""};ingresoTurno={conductor:"",auxiliar1:"",auxiliar2:""};$("bloqueAux2").style.display="none";$("btnAux2").style.display="flex";if($("cierreTurnoResumen"))$("cierreTurnoResumen").innerHTML="";
     $("fecha").value=hoyISO();clientes=[];almuerzo=nuevoAlmuerzo();render();pintarAlmuerzo();calcularGastos();calcularCaja();guardar();
     toast("Reporte nuevo listo");window.scrollTo({top:0,behavior:"smooth"});
@@ -1035,8 +1041,9 @@
     if(R.r.Efectivo>0)t+="• Efectivo: "+money(R.r.Efectivo)+"\n";
     if(R.r.Transferencia>0)t+="• Transferencia: "+money(R.r.Transferencia)+"\n";
     if(R.r.FirmaCredito>0)t+="• Firma-Crédito: "+money(R.r.FirmaCredito)+"\n";
-    t+="Total facturado: "+money(R.fact)+"\n";
-    t+="Total recaudado (sin firma): "+money(R.recaudado)+"\n";
+    t+="Total facturado (entregas): "+money(R.ent.fact)+"\n";
+    t+="Total recaudado (cobros): "+money(R.cob.fact)+"\n";
+    t+="Recaudado efect + transf (sin firma): "+money(R.recaudado)+"\n";
     if(R.cob.fact>0||R.cob.Efectivo>0||R.cob.Transferencia>0){
       t+="\n   🔹 Entregas: "+money(R.ent.Efectivo+R.ent.Transferencia)+" (efect "+money(R.ent.Efectivo)+" / transf "+money(R.ent.Transferencia)+")\n";
       t+="   🔸 Cobros: "+money(R.cob.Efectivo+R.cob.Transferencia)+" (efect "+money(R.cob.Efectivo)+" / transf "+money(R.cob.Transferencia)+")\n";
@@ -1146,6 +1153,9 @@
     $("conductor").addEventListener("change",function(){guardar();reservarCampo("Conductor","conductor");pintarCierreTurno();});
     $("auxiliar").addEventListener("change",function(){guardar();reservarCampo("Auxiliar","auxiliar");pintarCierreTurno();});
     $("auxiliar2").addEventListener("change",function(){guardar();reservarCampo("Auxiliar","auxiliar2","Auxiliar2");pintarCierreTurno();});
+    [["ingConductor","conductor"],["ingAuxiliar1","auxiliar1"],["ingAuxiliar2","auxiliar2"]].forEach(function(par){
+      $(par[0]).addEventListener("change",function(){var v=this.value;if(v){var e=estado();if(e.horaSalida&&v<e.horaSalida){toast("El inicio de turno no puede ser anterior a la salida de bodega");this.value=ingresoTurno[par[1]]||"";return;}if(e.horaFin&&v>e.horaFin){toast("El inicio de turno no puede ser posterior a la finalización");this.value=ingresoTurno[par[1]]||"";return;}}ingresoTurno[par[1]]=v;guardar();});
+    });
     $("btnAux2").addEventListener("click",function(){$("bloqueAux2").style.display="block";this.style.display="none";guardar();});
     $("btnQuitarAux2").addEventListener("click",function(){$("auxiliar2").value="";reservados.Auxiliar2="";guardarReservados();$("bloqueAux2").style.display="none";$("btnAux2").style.display="flex";guardar();pintarCierreTurno();});
     ["kmInicial","kmFinal","canastIni","canastFin","clientesProg"].forEach(function(id){$(id).addEventListener("input",function(){guardar();calcular();});});
@@ -1156,7 +1166,7 @@
     $("consig").addEventListener("input",function(){this.value=this.value.trim()===""?"":agrupa(aNum(this.value));guardar();calcular();});
     ["parqueadero","peaje","otrosGasto"].forEach(function(id){$(id).addEventListener("input",function(){this.value=this.value.trim()===""?"":agrupa(aNum(this.value));guardar();calcularGastos();});});
     $("otrosCual").addEventListener("input",function(){guardar();});
-    var ah=document.querySelectorAll("[data-ahora]");for(var a=0;a<ah.length;a++){ah[a].addEventListener("click",function(){$(this.getAttribute("data-ahora")).value=horaActual();guardar();});}
+    var ah=document.querySelectorAll("[data-ahora]");for(var a=0;a<ah.length;a++){ah[a].addEventListener("click",function(){var el=$(this.getAttribute("data-ahora"));el.value=horaActual();try{el.dispatchEvent(new Event("change",{bubbles:true}));}catch(e){}guardar();});}
     var hd=document.querySelectorAll("[data-toggle]");for(var h=0;h<hd.length;h++){hd[h].addEventListener("click",function(){var card=document.querySelector('[data-card="'+this.getAttribute("data-toggle")+'"]');if(card)card.classList.toggle("cerrada");});}
     $("btnAdd").addEventListener("click",agregarCliente);
     $("btnNuevo").addEventListener("click",nuevoReporte);
@@ -1167,8 +1177,8 @@
     $("btnAlmUbic").addEventListener("click",capturarAlmuerzo);
     $("btnCerrarTurno").addEventListener("click",function(){pintarCierreTurno();$("bloqueCerrarTurno").style.display="block";});
     $("btnCtGuardar").addEventListener("click",guardarCierreTurno);
-    $("btnCtCancelar").addEventListener("click",function(){$("ctColab").value="";$("ctIngreso").value="";$("ctHora").value="";$("bloqueCerrarTurno").style.display="none";});
-    $("cierreTurnoResumen").addEventListener("click",function(e){var b=e.target&&e.target.closest?e.target.closest("[data-ct-del]"):null;if(!b)return;var k=b.getAttribute("data-ct-del");cierreTurno[k]="";ingresoTurno[k]="";pintarCierreTurno();guardar();calcular();});
+    $("btnCtCancelar").addEventListener("click",function(){$("ctColab").value="";$("ctHora").value="";$("bloqueCerrarTurno").style.display="none";});
+    $("cierreTurnoResumen").addEventListener("click",function(e){var b=e.target&&e.target.closest?e.target.closest("[data-ct-del]"):null;if(!b)return;var k=b.getAttribute("data-ct-del");cierreTurno[k]="";pintarCierreTurno();guardar();calcular();});
     $("btnCSV").addEventListener("click",exportarCSV);
     $("btnGenerar").addEventListener("click",generar);
     $("btnCerrar").addEventListener("click",cerrarModal);
