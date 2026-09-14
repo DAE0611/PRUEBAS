@@ -138,7 +138,7 @@
   <div class="hrow">
     <div>
       <h1>Reporte de Ruta</h1>
-      <div class="sub">Logística Robedans · <span id="appVer">1.0.2</span></div>
+      <div class="sub">Logística Robedans · <span id="appVer">1.0.3</span></div>
       <div class="saved" id="savedInfo">Los datos se guardan solos en este teléfono</div>
       <div class="syncinfo sync-ok" id="syncInfo">☁️ Sincronización activada</div>
     </div>
@@ -563,6 +563,9 @@
     if(!$("base").value.trim())f.push("Base entregada");
     if(!$("canastIni").value.trim())f.push("Canastillas de salida");
     if(!$("clientesProg").value.trim())f.push("Clientes programados");
+    if($("conductor").value.trim() && !$("ingConductor").value)f.push("Hora de inicio de turno del Conductor");
+    if($("auxiliar").value.trim() && !$("ingAuxiliar1").value)f.push("Hora de inicio de turno del Auxiliar 1");
+    if($("auxiliar2").value.trim() && !$("ingAuxiliar2").value)f.push("Hora de inicio de turno del Auxiliar 2");
     return f;
   }
   function capturarUbicacion(i){
@@ -922,7 +925,7 @@
     if(bj){
       if(avJ.prog>0&&avJ.faltan>0){
         bj.style.display="block";
-        $("justifAviso").textContent="⚠️ Cumplimiento "+avJ.pct+"%: se atendieron "+avJ.total+" de "+avJ.prog+" clientes programados. Faltan "+avJ.faltan+". Debes justificar antes de enviar el reporte.";
+        $("justifAviso").textContent="⚠️ Cumplimiento "+avJ.pct+"%: se atendieron "+avJ.total+" de "+avJ.prog+" clientes programados. Faltan "+avJ.faltan+". La justificación debe ser clara (mínimo 4 caracteres) antes de enviar el reporte.";
       }else bj.style.display="none";
     }
     var R=calcRecaudo();
@@ -1077,8 +1080,8 @@
     if(!$("kmFinal").value.trim())errores.push("• Falta el kilometraje final");
     if(!$("canastFin").value.trim())errores.push("• Faltan las canastillas de regreso");
     var avR=avanceRuta();
-    if(avR.prog>0&&avR.faltan>0&&!$("justifNoAtend").value.trim())
-      errores.push("• Cumplimiento "+avR.pct+"% ("+avR.total+" de "+avR.prog+"): justifica por qué no se atendieron "+avR.faltan+" cliente(s)");
+    if(avR.prog>0&&avR.faltan>0&&$("justifNoAtend").value.trim().length<4)
+      errores.push("• Cumplimiento "+avR.pct+"% ("+avR.total+" de "+avR.prog+"): la justificación de los "+avR.faltan+" cliente(s) no atendidos debe ser clara (mínimo 4 caracteres)");
     var horas={}, dup={};
     for(var i=0;i<clientes.length;i++){var c=clientes[i];if(!c.nombre.trim())continue;
       if(!c.hora)errores.push("• Cliente "+(i+1)+" ("+c.nombre.trim()+"): falta la hora de entrega");
